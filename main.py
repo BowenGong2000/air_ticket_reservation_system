@@ -10,14 +10,27 @@ conn = pymysql.connect(host='localhost',
 					   port=8890,
                        user='root',
                        password='root',
-                       db='blog',
+                       db='air_ticket_reservation_system',
                        charset='utf8mb4',
                        cursorclass=pymysql.cursors.DictCursor)
 
-#Define a route to hello function
+#Define a route to the welcome page 
 @app.route('/')
 def hello():
-	return render_template('index.html')
+	return render_template('welcome.html')
+
+#Define a route to the customer register page 
+@app.route('/c_register')
+def c_register():
+	return render_template('c_register.html')
+
+#Define a route to the staff register page 
+@app.route('/s_register')
+def s_register():
+	return render_template('s_register.html')
+
+
+
 
 #Define route for login
 @app.route('/login')
