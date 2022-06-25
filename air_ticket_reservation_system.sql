@@ -12,11 +12,11 @@ CREATE TABLE airport(
 CREATE TABLE staff(
     us_name varchar(30) NOT NULL,
     al_name varchar(30) NOT NULL,
-    pswd varchar(30) NOT NULL,
+    pswd varchar(300) NOT NULL,
     f_name varchar(30) NOT NULL,
     l_name varchar(30) NOT NULL,
     dob DATE NOT NULL,
-    PRIMARY KEY (us_name, al_name),
+    PRIMARY KEY (us_name),
     FOREIGN KEY (al_name) REFERENCES airline(al_name));
   
 CREATE TABLE phone_num(
@@ -24,14 +24,16 @@ CREATE TABLE phone_num(
     al_name varchar(30) NOT NULL,
     pho_num numeric(9,0) NOT NULL,
     PRIMARY KEY (us_name, al_name, pho_num),
-    FOREIGN KEY (us_name, al_name) REFERENCES staff(us_name, al_name));
-
+    FOREIGN KEY (us_name) REFERENCES staff(us_name),
+    FOREIGN KEY (al_name) REFERENCES airline(al_name));
+ 
 CREATE TABLE email(
     us_name varchar(30) NOT NULL,
     al_name varchar(30) NOT NULL,
     email varchar(30) NOT NULL,
     PRIMARY KEY (us_name, al_name, email),
-    FOREIGN KEY (us_name, al_name) REFERENCES staff(us_name, al_name));
+    FOREIGN KEY (us_name) REFERENCES staff(us_name),
+    FOREIGN KEY (al_name) REFERENCES airline(al_name));
     
 CREATE TABLE airplane(
     ap_id numeric(10,0) NOT NULL,
@@ -67,7 +69,7 @@ CREATE TABLE ticket(
 
 CREATE TABLE customer(
     email varchar(30) NOT NULL,
-    pswd varchar(30) NOT NULL,
+    pswd varchar(300) NOT NULL,
     cus_name varchar(30) NOT NULL,
     build_num varchar(30),
     street varchar(30),
@@ -75,7 +77,7 @@ CREATE TABLE customer(
     state char(2),
     pho_num numeric(10,0),
     pspt_num varchar(10),
-    pspt_exp numeric(8,0),
+    pspt_exp DATE NOT NULL,
     pspt_country varchar(30),
     dob DATE NOT NULL,
     PRIMARY KEY (email));

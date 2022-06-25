@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Staff Login</title>
+</head>
+
+<body>
+	<h1>Log In</h1>
+
+	<form action="/s_login_auth" method="POST">
+		<label for="us_name">User name:</label>
+		<input type="text" name="us_name" placeholder="username" required /> </br>
+		<label for="password">Password:</label>
+		<input type="password" name="pswd" placeholder="password" required /></br>
+
+		<input type="submit" value=Login />
+
+		{% if error %}
+		<p class="error"><strong>Error:</strong> {{error}}</p>
+		{% endif %}
+	</form>
+
+<a href="/">Go back</a>
+</body>
+</html>
