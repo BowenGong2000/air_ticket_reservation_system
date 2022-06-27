@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+</head>
+<body>
+    <h1>Rate Flight {{flt_num}}</h1>
+    <form action="/c_rateFlight" method="POST">
+		<input type = "hidden" name = "al_name" value={{al_name}} />
+        <input type = "hidden" name = "ap_id" value={{ap_id}} />
+        <input type = "hidden" name = "flt_num" value={{flt_num}} />
+        <input type = "hidden" name = "dep_dnt" value="{{dep_dnt}}" />
+        <label for="rate"> Rate: </label>
+	    <input type="number" name = "rate" max="5" min="0" required/></br>
+        <label for="comment"> Comment: </label></br>
+	    <textarea name="comment" rows="5" cols="33" maxlength="200"></textarea> </br>
+        <input type="submit" value = Submit />
+	    {% if error %}
+		    <p class="error"><strong>Error:</strong> {{error}}</p>
+	    {% endif %}
+    </form>
+
+    <a href="/c_pastFlight">Back</a>
+</body>
+</html>

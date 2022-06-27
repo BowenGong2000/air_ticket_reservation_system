@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Customer Search Flight</title>
+</head>
+
+<body>
+    <h1>Search Flight</h1>
+    <form action="/c_searchFlightAuth" method="POST">
+	    <label for="is_airport"> Search for Airports </label>
+		<input type="checkbox" name="is_airport" value="on"></br>
+		<label for="s_airport"> Start From: </label>
+		<input type="text" name = "s_airport" placeholder="source airport/city" maxlength="20" required/> </br>
+		<label for="d_airport"> To: </label>
+	    <input type="text" name = "d_airport" placeholder="destination airport/city" maxlength="20" required/></br>
+		<label for="d_date"> Departure Date: </label>
+		<input type="date" name = "d_date" placeholder="departure date" ></br>
+		<label for="is_round"> Search for Round Trip </label>
+		<input type="checkbox" name="is_round" value="on"></br>
+		<label for="r_date"> Return Date: </label>
+		<input type="date" name = "r_date" placeholder="return date" ></br>
+	    <input type="submit" value = Search />
+	    {% if error %}
+		    <p class="error"><strong>Error:</strong> {{error}}</p>
+	    {% endif %}
+    </form>
+    <br>
+    {% if posts %}
+	<table>
+		<th>Airline Name</th>
+		<th>Flight Number</th>
+		<th>Departure Date and Time</th>
+		<th>Departure Airport</th>
+		<th>Departure City</th>
+		<th>Arrival Date and Time</th>
+		<th>Arrival Airport</th>
+		<th>Arrival City</th>
+        <th> Status </th>
+
+	{% for line in posts %}
+		<tr>
+			<td>{{line['al_name']}}</td>
+			<td>{{line['flt_num']}}</td>
+			<td>{{line['dep_dnt']}}</td>
+            <td>{{line['dep_apt']}}</td>
+            <td>{{line['dep_city']}}</td>
+            <td>{{line['arr_dnt']}}</td>
+			<td>{{line['arr_apt']}}</td>
+			<td>{{line['arr_city']}}</td>
+            <td>{{line['stts']}}</td>
+			<td>
+				<form action="/c_purchase" method="POST">
+					<input type = "hidden" name = "al_name" value="{{line['al_name']}}" />
+					<input type = "hidden" name = "ap_id" value="{{line['ap_id']}}" />
+					<input type = "hidden" name = "flt_num" value="{{line['flt_num']}}" />
+					<input type = "hidden" name = "dep_dnt" value="{{line['dep_dnt']}}" />
+					<input type="submit" value = Purchase />
+				</form>
+			</td>
+		</tr>
+	{% endfor %}
+	</table>
+	{% endif %}
+
+	{% if error2 %}
+		<p class="error"><strong>Error:</strong> {{error2}}</p>
+	{% endif %}
+
+
+    <a href="/c_homepage">Go Back</a></br>
+
+    
+</body>
+</html>

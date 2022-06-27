@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Customer View Flight</title>
+</head>
+
+<body>
+    <h1>My Spending</h1> 
+
+    <b>Total spending last 6 month: {{spend}}  USD </b></br>
+
+	{% if spend!=0 %}
+	<table>
+        <th>Date</th>
+		<th>Spending</th>
+
+	{% for line in posts2 %}
+		<tr>
+            <td>{{line['date']}}</td>
+			<td>{{line['total']}}</td>
+		</tr>
+	{% endfor %}
+	</table>
+	{% endif %}
+	</br>
+
+    <form action="/trackSpending_auth" method="POST">
+		<b>Search for a Time Range</b></br>
+		<label for="s_date"> Start from </label>
+		<input type="date" name = "start_date" required/> </br>
+		<label for="e_date"> To </label>
+		<input type="date" name = "end_date" required/> </br>
+		<input type="submit" value = Search />
+	</form>
+
+	</br>
+
+
+    <a href="/c_homepage">Go Back</a></br>
+    
+</body>
+</html>

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Customer Home</title>
+</head>
+
+<body>
+    <body>
+        <h1>Purchase Ticket</h1>
+        <b>Flight Number {{flt_num}}</b>
+        <br>
+        <b>Ticket Price: {{price}} USD</b></br>
+        <b>Ticket Left: {{seat}}</b></br>
+        <!-- <b>Ticket谢谢谢谢谢: {{al_name}} USD</b></br> -->
+    
+        <form action="/purchaseAuth" method="POST">
+            <input type = "hidden" name = "al_name" value={{al_name}} />
+            <input type = "hidden" name = "flt_num" value={{flt_num}} />
+            <input type = "hidden" name = "ap_id" value={{ap_id}} />
+            <input type = "hidden" name = "dep_dnt" value= {{dep_dnt}} />
+            <input type = "hidden" name = "sold_price" value={{price}} />
+    
+            <label for="card_type">Card Type:</label>
+            <select name="card_type">
+                <option value="credit">credit</option>
+                <option value="debit">debit</option>
+            </select> </br>
+            <label for="card_num">Card Number:</label>
+            <input type="number" name = "card_num" placeholder="card number" min="1000000000000000" maxlength="9999999999999999" required/> </br>
+            <label for="card_name">Card Name:</label>
+            <input type="text" name = "card_name" placeholder="card name" maxlength="20" required/> </br>
+            <label for="exp_date">Expire Date:</label>
+            <input type="date" name = "exp_date" placeholder="expire_date" required/> </br>
+            <input type="submit" value = Pay />
+        </form>
+    
+</body>
+</html>

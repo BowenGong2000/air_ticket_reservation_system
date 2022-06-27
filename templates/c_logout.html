@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Create Account</title>
+</head>
+
+<body>
+    <h1> Create Account </h1>
+
+    <form action="/c_register_auth" method="POST">
+        <label for="email">Email:</label>
+        <input type="text" name = "email" placeholder="email" maxlength="30" required/> </br>
+        <label for="password">Password:</label>
+        <input type="password" name = "pswd" placeholder="pswd" maxlength="30" required/></br>
+        <label for="name">Name:</label>
+        <input type="text" name = "c_name" placeholder="name" maxlength="30" required/> </br>
+        <label for="bd_num">Building Number:</label>
+        <input type="text" name = "bd_num" placeholder="building number" maxlength="30"/> </br>
+        <label for="street">Street:</label>
+        <input type="text" name = "street" placeholder="street" maxlength="30"/> </br>
+        <label for="city">City:</label>
+        <input type="text" name = "city" placeholder="city" maxlength="30"/> </br>
+        <label for="state">State:</label>
+        <input type="text" name = "state" placeholder="state (two digit)" maxlength="2"/> </br>
+        <label for="ph_num">Phone Number:</label>
+        <input type="number" name = "ph_num" placeholder="phone number" min="1000000000"  max="9999999999"/> </br>
+        <label for="ppt_num">Passport Number:</label>
+        <input type="text" name = "ppt_num" placeholder="passport number" maxlength="30"/> </br>
+        <label for="ppt_exp">Passport Expire Date:</label>
+        <input type="date" name = "ppt_exp" placeholder="passport expiration date" required/> </br>
+        <label for="ppt_country">Passport Country:</label>
+        <input type="text" name = "ppt_country" placeholder="passport country" maxlength="30" /> </br>
+        <label for="dob">Date of Birth:</label>
+        <input type="date" name = "dob" placeholder="date of birth" required/> </br>
+        
+        <input type="submit" value = Register />
+
+        {% if error %}
+            <p class="error"><strong>Error:</strong> {{error}}</p>
+        {% endif %}
+    </form>
+
+    </br>
+    
+    <a href="/">Go back</a>
+</body>

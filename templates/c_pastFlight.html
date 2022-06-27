@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Customer View Flight</title>
+</head>
+
+<body>
+    <h1>View My Past Flight</h1>
+
+    {% if posts %}
+    <table>
+        <th> Ticket Number </th>
+		<th> Airline Name </th>
+		<th> Flight Number </th>
+		<th> Departure Time </th>
+		<th> Departure Airport </th>
+		<th> Departure City </th>
+		<th> Arrival Time </th>
+		<th> Arrival Airport </th>
+		<th> Arrival City </th>
+        <th> Status </th>
+        <!-- SELECT `tkt_id`, al_name, flt_num, dep_dnt, dep_apt, A.city, arr_dnt, arr_apt, B.city, stts FROM ticket NATURAL JOIN purchase NATURAL JOIN flight, airport A, airport B WHERE dep_apt = A.apt_name and arr_apt = B.apt_name and dep_dnt > now() and email = %s -->
+	{% for line in posts %}
+		<tr>
+            <td>{{line['tkt_id']}}</td>
+			<td>{{line['al_name']}}</td>
+			<td>{{line['flt_num']}}</td>
+			<td>{{line['dep_dnt']}}</td>
+			<td>{{line['dep_apt']}}</td>
+			<td>{{line['dep']}}</td>
+			<td>{{line['arr_dnt']}}</td>
+			<td>{{line['arr_apt']}}</td>
+			<td>{{line['arr']}}</td>
+            <td>{{line['stts']}}</td>
+            <td>
+				<form action="/c_rate" method="POST">
+                    <input type = "hidden" name = "al_name" value={{line['al_name']}} />
+					<input type = "hidden" name = "ap_id" value={{line['ap_id']}} />
+					<input type = "hidden" name = "flt_num" value={{line['flt_num']}} />
+					<input type = "hidden" name = "dep_dnt" value="{{line['dep_dnt']}}" />
+					<input type="submit" value = Rate&Comment />
+				</form>
+			</td>
+		</tr>
+	{% endfor %}
+	</table>
+
+
+    {% else %}
+	<b> No Past flight plans! </b></br>
+
+    {% endif %}
+    <br>
+    <a href="/c_viewFlight">Go Back</a></br>
+</body>
+</html>

@@ -46,6 +46,7 @@ CREATE TABLE airplane(
     
 CREATE TABLE flight(
     al_name varchar(30) NOT NULL,
+    ap_id varchar(30) NOT NULL,
     flt_num numeric(10,0) NOT NULL,
     dep_dnt DATETIME NOT NULL,
     dep_apt varchar(30) NOT NULL,
@@ -53,19 +54,20 @@ CREATE TABLE flight(
     arr_apt varchar(30) NOT NULL,
     base_price numeric(6,2) NOT NULL,
     stts varchar (30),
-    PRIMARY KEY (al_name, flt_num, dep_dnt),
+    PRIMARY KEY (al_name, ap_id ,flt_num, dep_dnt),
     FOREIGN KEY (al_name) REFERENCES airline(al_name),
     FOREIGN KEY (dep_apt) REFERENCES airport(apt_name),
     FOREIGN KEY (arr_apt) REFERENCES airport(apt_name)); 
 
 CREATE TABLE ticket(
     al_name varchar(30) NOT NULL,
+    ap_id varchar(30) NOT NULL,
     tkt_id numeric(20,0) NOT NULL,
     flt_num numeric(10,0) NOT NULL,
     dep_dnt DATETIME NOT NULL,
     sold_price numeric(10,0) NOT NULL,
     PRIMARY KEY (tkt_id),
-    FOREIGN KEY (al_name, flt_num, dep_dnt) REFERENCES flight(al_name, flt_num, dep_dnt));
+    FOREIGN KEY (al_name, ap_id, flt_num, dep_dnt) REFERENCES flight(al_name, ap_id,flt_num, dep_dnt));
 
 CREATE TABLE customer(
     email varchar(30) NOT NULL,
@@ -96,11 +98,12 @@ CREATE TABLE purchase(
     
 CREATE TABLE rate(
     al_name varchar(30) NOT NULL,
+    ap_id varchar(30) NOT NULL,
     flt_num numeric(10,0) NOT NULL,
     dep_dnt DATETIME NOT NULL,
     email varchar(30) NOT NULL,
     rate numeric(2,1) NOT NULL,
     com varchar(200) NOT NULL,
     PRIMARY KEY (al_name, flt_num, dep_dnt, email),
-    FOREIGN KEY (al_name, flt_num, dep_dnt) REFERENCES flight(al_name, flt_num, dep_dnt),
+    FOREIGN KEY (al_name, ap_id, flt_num, dep_dnt) REFERENCES flight(al_name, ap_id,flt_num, dep_dnt),
     FOREIGN KEY (email) REFERENCES customer(email));

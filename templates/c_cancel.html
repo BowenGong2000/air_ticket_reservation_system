@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Cancel Flight</title>
+</head>
+
+<body>
+    <h1> Cancel Flight!</h1>
+    <!-- Enter ticket number: <input type=text size=20 name="ticketid">
+    <input type=submit value="submit"> -->
+
+    <form action="/c_cancel_auth" method="POST">
+		<label for="ticketID">Ticket number :</label><br>
+		<input type="text" name = "ticketID" placeholder="TicketID" required/> </br>
+		<input type="submit" value=Submit />
+		{% if message %}
+		<p class="error"><strong>Status:</strong> {{message}}</p>
+		{% endif %}
+	</form>
+
+    <a href="/c_futureFlight">Go Back</a></br>
+</body>
+</html>
