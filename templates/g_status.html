@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Search Flight</title>
+</head>
+
+<body>
+    <h1>Check Flight Status</h1>
+    <form action="/check_status_auth" method="POST">
+	    <label for="arr_apt"> Search for arrival date </label>
+		<input type="checkbox" name="arr_apt" value="on"></br>
+		<label for="s_airport"> Airline Name: </label>
+		<input type="text" name = "al_name" placeholder="Airline" maxlength="20" required/> </br>
+		<label for="d_airport"> Flight Number </label>
+	    <input type="text" name = "flt_num" placeholder="Flight Number" maxlength="20" required/></br>
+		<label for="d_date"> Date: </label>
+		<input type="date" name = "d_date" placeholder="date" required></br>
+	    <input type="submit" value = Search />
+	    {% if error %}
+		    <p class="error"><strong>Error:</strong> {{error}}</p>
+	    {% endif %}
+    </form>
+    <br>
+    {% if posts %}
+	<table>
+		<th>Airline Name</th>
+		<th>Flight Number</th>
+		<th>Departure Date and Time</th>
+		<th>Arrival Date and Time</th>
+        <th> Status </th>
+
+	{% for line in posts %}
+		<tr>
+			<td>{{line['al_name']}}</td>
+			<td>{{line['flt_num']}}</td>
+			<td>{{line['dep_dnt']}}</td>
+            <td>{{line['arr_dnt']}}</td>
+            <td>{{line['stts']}}</td>
+		</tr>
+	{% endfor %}
+	</table>
+	{% endif %}
+
+
+    <a href="/">Go Back</a></br>
+
+    
+</body>
+</html>

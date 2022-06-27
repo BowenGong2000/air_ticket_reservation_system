@@ -1,4 +1,5 @@
 #Import Flask Library
+from distutils.log import error
 import email
 from email import message
 from flask import Flask, render_template, request, session, url_for, redirect
@@ -428,6 +429,97 @@ def c_logout():
 	return redirect('/')
 
 
+@app.route('/g_search')
+def g_search():
+	return render_template("g_search.html")
+
+@app.route('/g_searchFlightAuth',methods=['GET', 'POST'])
+def g_searchFlightAuth():
+	dep_airport = request.form['s_airport']
+	arr_airport = request.form['d_airport']
+	d_date = request.form['d_date']
+	r_date = request.form['r_date']
+
+	# Search for Airports or City
+	# Search for Round or not
+	x = request.form.get("is_airport")  # None 说明search for city / On 说明 search for airport
+	y = request.form.get("is_round") # None 说明 不是round  / On 说明 round (需要填写r_date)
+	print(x)
+	print(y)
+	print(d_date)
+
+	if (d_date == ""):
+		error = "Please enter departure date"
+		return render_template('/c_searchFlight.html', error = error)
+
+	if (y != None and  r_date == ""):
+		error = "Please enter return date"
+		return render_template('/c_searchFlight.html', error = error)
+
+	if (x == None):   #city
+		cursor = conn.cursor()
+		# executes query
+		query = 'SELECT al_name, ap_id, flt_num, dep_dnt, A.apt_name dep_apt, A.city as dep_city, arr_dnt, B.apt_name arr_apt, B.city as arr_city, stts FROM flight, airport A, airport B WHERE A.apt_name = flight.dep_apt and B.apt_name = flight.arr_apt and A.city = %s and B.city = %s  and date(dep_dnt) = %s '
+		cursor.execute(query, (dep_airport, arr_airport, d_date))
+		data = cursor.fetchall()
+		if (y != None):
+			query2 = 'SELECT al_name, ap_id, flt_num, dep_dnt, A.apt_name dep_apt, A.city as dep_city, arr_dnt, B.apt_name arr_apt, B.city as arr_city, stts FROM flight, airport A, airport B WHERE A.apt_name = flight.dep_apt and B.apt_name = flight.arr_apt and A.city = %s and B.city = %s  and date(dep_dnt) = %s '
+			cursor.execute(query2, (arr_airport, dep_airport, r_date))
+			data += cursor.fetchall()
+	
+	elif (x != None):  # airport
+		cursor = conn.cursor()
+		# executes query
+		query = 'SELECT al_name, ap_id, flt_num, dep_dnt, A.apt_name dep_apt, A.city as dep_city, arr_dnt, B.apt_name arr_apt, B.city as arr_city, stts FROM flight, airport A, airport B WHERE A.apt_name = flight.dep_apt and B.apt_name = flight.arr_apt and A.apt_name = %s and B.apt_name = %s  and date(dep_dnt) = %s'
+		cursor.execute(query, (dep_airport, arr_airport, d_date))
+		data = cursor.fetchall()
+		if (y != None):
+			query2 = 'SELECT al_name, ap_id, flt_num, dep_dnt, A.apt_name dep_apt, A.city as dep_city, arr_dnt, B.apt_name arr_apt, B.city as arr_city, stts FROM flight, airport A, airport B WHERE A.apt_name = flight.dep_apt and B.apt_name = flight.arr_apt and A.apt_name = %s and B.apt_name = %s  and date(dep_dnt) = %s'
+			cursor.execute(query2, (arr_airport, dep_airport, r_date))
+			data += cursor.fetchall()
+
+	if(data):
+		return render_template('g_search.html', posts=data)
+	else:
+		return render_template('g_search.html', error='Sorry, no such flight exist.')
+
+
+
+
+@app.route('/check_status')
+def check_status():
+
+	return render_template('g_status.html')
+
+@app.route('/check_status_auth',methods=['GET', 'POST'])
+def check_status_auth():
+	x = request.form.get("arr_apt")  # None 说明search dep / On 说明 search for arr
+
+	al_name = request.form['al_name']
+	flt_num = request.form['flt_num']
+	d_date = request.form['d_date']
+
+	if (x == None):
+		cursor = conn.cursor()
+		query = 'SELECT al_name, flt_num, dep_dnt, arr_dnt, stts FROM flight WHERE al_name =%s and flt_num = %s and date(dep_dnt) = %s'
+		cursor.execute(query, (al_name, flt_num, d_date))
+		data = cursor.fetchall()
+		cursor.close()
+	else:
+		cursor = conn.cursor()
+		query = 'SELECT al_name, flt_num, dep_dnt, arr_dnt, stts FROM flight WHERE al_name =%s and flt_num = %s and date(arr_dnt) = %s'
+		cursor.execute(query, (al_name, flt_num, d_date))
+		data = cursor.fetchall()
+		cursor.close()
+
+	if (data):
+		error = ''
+		return render_template('g_status.html', posts = data, error = error)
+	else:
+		print(666666)
+		error = "No such flight" 
+		return render_template('g_status.html', posts = data, error = error)
+
 
 
 # Define a route to the staff register page 
@@ -512,6 +604,9 @@ def s_login_auth():
 		error = 'Invalid login or username'
 		return render_template('s_login.html', error=error)
 
+
+
+
 # Staff home page
 @app.route('/s_homepage')
 def s_homepage():
@@ -524,6 +619,8 @@ def s_homepage():
 def logout():
 	session.pop('username')
 	return redirect('/')
+
+
 		
 app.secret_key = 'some key that you will never guess'
 #Run the app on localhost port 5000
