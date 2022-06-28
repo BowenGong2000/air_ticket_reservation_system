@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Flight Info</title>
+</head>
+
+<body>
+    <h1>Customers form {{flt_num}} at {{dep_dnt}}</h1>
+    {% if posts %}
+    <table border="2" cellspacing="2">
+        <th>Email</th>
+        <th>Ticket Number</th>
+        <th>Purchase Date</th>
+
+        {% for line in posts %}
+            <tr>
+                <td>{{line['email']}}</td>
+                <td>{{line['tkt_id']}}</td>
+                <td>{{line['p_dnt']}}</td>
+            </tr>
+        {% endfor %}
+    </table>
+    {% elif error %}
+    <b>{{error}}</b></br>
+    {% endif %}
+
+    <a href="/s_searchFlight">Go Back</a>
+
+</body>
+</html>

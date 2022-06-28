@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Flight Info</title>
+</head>
+
+<body>
+    <h1>{{al_name}} Flight Infornation</h1>
+    <b>Flights in the next 30 Days:</b>
+
+    <style>
+        table, th, td {
+            border: lpx solid black;
+        }
+    </style>
+
+    <table border="2" cellspacing="2">
+        <th>Airplane ID</th>
+        <th>Flight Number</th>
+        <th>Depature Time</th>
+        <th>Departure Airport</th>
+        <th>Arriving Airport</th>
+        <th>Arriving Time</th>
+        <th>Base Price</th>
+        <th>Status</th>
+        <th>Change Status</th>
+        <th>View Rating</th>
+
+        {% for line in posts %}
+        <tr>
+            <td>{{line['ap_id']}}</td>
+            <td>{{line['flt_num']}}</td>
+            <td>{{line['dep_dnt']}}</td>
+            <td>{{line['dep_apt']}}</td>
+            <td>{{line['arr_apt']}}</td>
+            <td>{{line['arr_dnt']}}</td>
+            <td>{{line['base_price']}}</td>
+            <td>{{line['stts']}}</td>
+            <td>
+                <form action="/s_changeStatus" method="POST">
+                    <input type = "hidden" name = "flt_num" value="{{line['flt_num']}}" />
+                    <input type = "hidden" name = "dep_dnt" value="{{line['dep_dnt']}}" />
+                    <input type = "hidden" name = "stts" value="{{line['stts']}}" />
+                    <input type="submit" value="Change Status" />
+                </form>
+            <td>
+                <form action="/s_viewRate" method="POST">
+                    <input type = "hidden" name = "flt_num" value="{{line['flt_num']}}" />
+                    <input type = "hidden" name = "dep_dnt" value="{{line['dep_dnt']}}" />
+                    <input type = "submit" value = "View Ratings" />
+                </form>
+            </td>
+            </td>
+        </tr>
+        {% endfor %}
+    </table>
+
+    <h1>
+        Add New Flights for {{al_name}} Airline
+    </h1>
+
+    <form action="/s_addFlight" method="POST">
+        <label for="airplane"> Airplane ID </label>
+        <input type="number" name="ap_id" placeholder="Airplane ID" required /> </br>
+        <label for="flt_num"> Flight Number </label>
+        <input type="text" name="flt_num" placeholder="Flight Number" required /> </br>
+        <label for="dep_dnt">Departure Date & Time</label>
+        <input type="datetime-local" name="dep_dnt" required /> </br>
+        <label for="dep_apt"> Departure Airport</label>
+        <input type="text" name="dep_apt" placeholder="Departure Airport" required /> </br>
+        <label for="arr_apt"> Arrival Airport</label>
+        <input type="text" name="arr_apt" placeholder="Arriving Airport" required /> </br>
+        <label for="arr_dnt">Arriving Date & Time</label>
+        <input type="datetime-local" name="arr_dnt" required /> </br>
+        <label for="price"> Base Price </label>
+        <input type="text" name="base_price" placeholder="Base Price" required /> </br>
+        <label for="stts"> Status </label>
+        <input type="text" name="stts" placeholder="Status" required /> </br>
+        <input type="submit" value="Add A New Flight"/></br>
+        {% if error %}
+        <p class="error"><strong>Error:</strong> {{error}}</p>
+        {% endif %}
+    </form>
+
+    <a href="/s_homepage">Go back</a>
+</body>
+</html>

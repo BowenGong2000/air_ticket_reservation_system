@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Flight Info</title>
+</head>
+
+<body>
+    <h1>{{al_name}}'s Airplane</h1>
+
+    {% if posts %}
+    <b>Flight {{flt_num}} Ratings</b></br>
+    <b>Average Rating is: {{avg_rate['avg_rate']}} </b>
+
+    <table border="2" cellspacing="2">
+        <th>Email</th>
+        <th>Rating</th>
+        <th>Comment</th>
+
+        {% for line in posts %}
+        <tr>
+            <td>{{line['email']}}</td>
+            <td>{{line['rate']}}</td>
+            <td>{{line['com']}}</td>
+        </tr>
+        {% endfor %}
+    </table></br>
+
+    {% else %}
+    <b>{{error}}</b></br>
+    {% endif %}
+
+    <a href="/s_flightInfo">Go back</a>
+
+</body>

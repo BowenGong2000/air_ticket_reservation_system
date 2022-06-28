@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Flight Info</title>
+</head>
+
+<body>
+    <h1>Search Flight</h1>
+    <form action="/s_flightSearch" method="POST">
+        <b> Search for Locations </b></br>
+	    <label for="is_airport"> Search for Airports </label>
+		<input type="checkbox" name="is_airport" value="on"></br>
+		<label for="s_airport"> Start From: </label>
+		<input type="text" name = "s_airport" placeholder="source airport/city" maxlength="20"/> </br>
+		<label for="d_airport"> To: </label>
+	    <input type="text" name = "d_airport" placeholder="destination airport/city" maxlength="20"/></br>
+    </br>
+        <b> OR Search for dates </b></br>
+		<label for="s_date"> Start From: </label>
+		<input type="date" name = "s_date" placeholder="start date" ></br>
+		<label for="e_date"> To: </label>
+		<input type="date" name = "e_date" placeholder="end date" ></br>
+	    <input type="submit" value = Search />
+	    {% if error %}
+		    <p class="error"><strong>Error:</strong> {{error}}</p>
+	    {% endif %}
+    </form>
+
+	{% if posts %}
+    <table border="2" cellspacing="2">
+        <th>Airplane ID</th>
+        <th>Flight Number</th>
+        <th>Depature Time</th>
+        <th>Departure Airport</th>
+        <th>Arriving Airport</th>
+        <th>Arriving Time</th>
+        <th>Base Price</th>
+        <th>Status</th>
+        <th>Change Status</th>
+        <th>View Rating</th>
+        <th>View Customer</th>
+
+        {% for line in posts %}
+            <tr>
+                <td>{{line['ap_id']}}</td>
+                <td>{{line['flt_num']}}</td>
+                <td>{{line['dep_dnt']}}</td>
+                <td>{{line['dep_apt']}}</td>
+                <td>{{line['arr_apt']}}</td>
+                <td>{{line['arr_dnt']}}</td>
+                <td>{{line['base_price']}}</td>
+                <td>{{line['stts']}}</td>
+                <td>
+                    <form action="/s_changeStatus_sf" method="POST">
+                        <input type = "hidden" name = "flt_num" value="{{line['flt_num']}}" />
+                        <input type = "hidden" name = "dep_dnt" value="{{line['dep_dnt']}}" />
+                        <input type = "hidden" name = "stts" value="{{line['stts']}}" />
+                        <input type="submit" value="Change Status" />
+                    </form>
+                <td>
+                    <form action="/s_viewRate_sf" method="POST">
+                        <input type = "hidden" name = "flt_num" value="{{line['flt_num']}}" />
+                        <input type = "hidden" name = "dep_dnt" value="{{line['dep_dnt']}}" />
+                        <input type = "submit" value = "View Ratings" />
+                    </form>
+                </td>
+                <td>
+                    <form action="/s_viewCustomer" method="POST">
+                        <input type = "hidden" name = "flt_num" value="{{line['flt_num']}}" />
+                        <input type = "hidden" name = "dep_dnt" value="{{line['dep_dnt']}}" />
+                        <input type = "submit" value = "View Customer" />
+                    </form>
+                </td>
+        </tr>
+        {% endfor %}
+    </table>
+    {% endif %}
+
+    <a href="/s_homepage">Go Back</a>
+</body>
+</html>

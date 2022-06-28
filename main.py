@@ -122,7 +122,6 @@ def c_futureFlight():
 
 	return render_template('c_futureflight.html', username=email, posts=data)
 
-
 @app.route('/c_pastFlight')
 def c_pastFlight():
 	email = session['email']
@@ -136,7 +135,6 @@ def c_pastFlight():
 
 
 	return render_template('c_pastFlight.html', username=email, posts=data)
-
 
 @app.route('/c_searchFlight')
 def c_searchFlight():
@@ -195,7 +193,6 @@ def c_searchFlightAuth():
 	else:
 		return render_template('c_searchFlight.html', error='Sorry, no such flight exist.')
 
-
 @app.route('/c_purchase', methods=['GET', 'POST'])
 def c_purchase():
 	email = session['email']
@@ -230,8 +227,6 @@ def c_purchase():
 	else:
 		seat=seat-sold
 		return render_template('c_purchase.html', username=email, al_name = al_name ,flt_num=flt_num, ap_id = ap_id, dep_dnt=dep_dnt, price=price, seat=seat)
-
-
 
 @app.route('/purchaseAuth', methods=['GET', 'POST'])
 def purchase_auth():
@@ -277,8 +272,6 @@ def purchase_auth():
 	cursor.close()
 	return render_template('c_paySuccess.html', username=email)
 	
-
-
 @app.route('/c_trackSpending', methods=['GET', 'POST'])
 def c_trackSpending():
 	email = session['email']
@@ -297,8 +290,6 @@ def c_trackSpending():
 	cursor.close()
 
 	return render_template('/c_trackSpending.html', email = email, spend = spend, posts2 = data2)
-
-
 
 @app.route('/trackSpending_auth',methods=['GET', 'POST'])
 def trackSpending_auth():
@@ -421,7 +412,6 @@ def c_rateFlight():
 		return redirect(url_for('c_pastFlight'))
 		
 
-
 # Customer logout
 @app.route('/c_logout')
 def c_logout():
@@ -484,8 +474,6 @@ def g_searchFlightAuth():
 		return render_template('g_search.html', error='Sorry, no such flight exist.')
 
 
-
-
 @app.route('/check_status')
 def check_status():
 
@@ -519,6 +507,7 @@ def check_status_auth():
 		print(666666)
 		error = "No such flight" 
 		return render_template('g_status.html', posts = data, error = error)
+
 
 
 
@@ -604,9 +593,6 @@ def s_login_auth():
 		error = 'Invalid login or username'
 		return render_template('s_login.html', error=error)
 
-
-
-
 # Staff home page
 @app.route('/s_homepage')
 def s_homepage():
@@ -614,14 +600,201 @@ def s_homepage():
 	al_name = session['al_name']
 	return render_template('s_homepage.html', us_name=us_name, al_name=al_name)
 
-
-@app.route('/logout')
+@app.route('/s_logout')
 def logout():
-	session.pop('username')
+	session.pop('us_name')
 	return redirect('/')
 
+@app.route('/s_flightInfo')
+def s_flightInfo():
+	us_name = session['us_name']
+	al_name = session['al_name']
 
+	cursor = conn.cursor()
+	query = 'SELECT ap_id, flt_num, dep_dnt, dep_apt, arr_apt, arr_dnt, base_price, stts FROM flight WHERE al_name = %s AND dep_dnt > CURRENT_TIMESTAMP AND dep_dnt < CURRENT_TIMESTAMP + INTERVAL 1 MONTH'
+	cursor.execute(query, (al_name))
+	data = cursor.fetchall()
+	cursor.close()
+
+	if (data):
+		return render_template('s_flightInfo.html', us_name=us_name, al_name=al_name, posts=data)
+	else:
+		return render_template('s_flightInfo.html', us_name=us_name, al_name=al_name)
+
+@app.route('/s_addFlight', methods=['GET', 'POST'])
+def s_addFlight():
+	# grabs information from the forms
+	us_name = session['us_name']
+	al_name = session['al_name']
+	ap_id = request.form['ap_id']
+	flt_num = request.form['flt_num']
+	dep_dnt = request.form['dep_dnt']
+	dep_apt = request.form['dep_apt']
+	arr_dnt = request.form['arr_dnt']
+	arr_apt = request.form['arr_apt']
+	base_price = request.form['base_price']
+	stts = request.form['stts']
+
+	# cursor used to send queries
+	cursor = conn.cursor()
+	# executes query
+	query = 'SELECT * FROM flight WHERE flt_num = %s and dep_dnt = %s'
+	cursor.execute(query, (flt_num, dep_dnt))
+	# stores the results in a variable
+	data = cursor.fetchone()
+	# use fetchall() if you are expecting more than 1 data row
+	query1 = 'SELECT ap_id, flt_num, dep_dnt, dep_apt, arr_dnt, arr_apt, base_price, stts FROM flight WHERE al_name = %s AND dep_dnt > CURRENT_TIMESTAMP AND dep_dnt < CURRENT_TIMESTAMP + INTERVAL 1 MONTH'
+	cursor.execute(query1, (al_name))
+	data1 = cursor.fetchall()
+	cursor.close()
+	error = None
+	if (data):
+		# If the previous query returns data, then user exists
+		error = "This flight already exists"
+		return render_template('s_flightInfo.html', us_name=us_name, al_name=al_name, posts=data1, error=error)
+	else:
+		cursor = conn.cursor()
+		ins = 'INSERT INTO flight VALUES(%s, %s, %s, %s, %s, %s, %s, %s, %s)'
+		cursor.execute(ins, (al_name, ap_id, flt_num, dep_dnt, dep_apt, arr_dnt, arr_apt, base_price, stts))
+		conn.commit()
+		cursor.close()
+		return redirect(url_for('s_flightInfo'))
+
+@app.route('/s_changeStatus', methods=['GET', 'POST'])
+def s_changeStatus():
+	flt_num = request.form['flt_num']
+	dep_dnt = request.form['dep_dnt']
+	stts = request.form['stts']
+	cursor = conn.cursor()
+	if(stts=="on-time"):
+		update = 'Update flight SET stts = "delayed" WHERE flt_num = %s and dep_dnt = %s'
+		cursor.execute(update, (flt_num, dep_dnt))
+	else:
+		update = 'Update flight SET stts = "on-time" WHERE flt_num = %s and dep_dnt = %s'
+		cursor.execute(update, (flt_num, dep_dnt))
+	conn.commit()
+	cursor.close()
+	return redirect("/s_flightInfo")
+
+@app.route('/s_changeStatus_sf', methods=['GET', 'POST'])
+def s_changeStatus_sf():
+	flt_num = request.form['flt_num']
+	dep_dnt = request.form['dep_dnt']
+	stts = request.form['stts']
+	cursor = conn.cursor()
+	if(stts=="on-time"):
+		update = 'Update flight SET stts = "delayed" WHERE flt_num = %s and dep_dnt = %s'
+		cursor.execute(update, (flt_num, dep_dnt))
+	else:
+		update = 'Update flight SET stts = "on-time" WHERE flt_num = %s and dep_dnt = %s'
+		cursor.execute(update, (flt_num, dep_dnt))
+	conn.commit()
+	cursor.close()
+	return redirect("/s_searchFlight")
+
+@app.route('/s_viewRate', methods=['GET', 'POST'])
+def s_viewRate():
+	us_name = session['us_name']
+	al_name = session['al_name']
+	flt_num = request.form['flt_num']
+	dep_dnt = request.form['dep_dnt']
+	cursor = conn.cursor()
+	query = 'SELECT email, rate, com FROM rate WHERE flt_num = %s and dep_dnt = %s ORDER BY email DESC'
+	cursor.execute(query, (flt_num, dep_dnt))
+	data = cursor.fetchall()
+	query2 = 'SELECT avg(rate) as avg_rate From rate WHERE flt_num = %s and dep_dnt = %s'
+	cursor.execute(query2, (flt_num, dep_dnt))
+	data1 = cursor.fetchone()
+	cursor.close()
+	if (data):
+		return render_template('s_viewRate.html', al_name=al_name, flt_num=flt_num, dep_dnt=dep_dnt, posts=data, avg_rate=data1)
+	else:
+		return render_template('s_viewRate.html', al_name=al_name, flt_num=flt_num, dep_dnt=dep_dnt, error="No Ratings Yet")
 		
+@app.route('/s_viewRate_sf', methods=['GET', 'POST'])
+def s_viewRate_sf():
+	us_name = session['us_name']
+	al_name = session['al_name']
+	flt_num = request.form['flt_num']
+	dep_dnt = request.form['dep_dnt']
+	cursor = conn.cursor()
+	query = 'SELECT email, rate, com FROM rate WHERE flt_num = %s and dep_dnt = %s ORDER BY email DESC'
+	cursor.execute(query, (flt_num, dep_dnt))
+	data = cursor.fetchall()
+	query2 = 'SELECT avg(rate) as avg_rate From rate WHERE flt_num = %s and dep_dnt = %s'
+	cursor.execute(query2, (flt_num, dep_dnt))
+	data1 = cursor.fetchone()
+	cursor.close()
+	if (data):
+		return render_template('s_viewRate_sf.html', al_name=al_name, flt_num=flt_num, dep_dnt=dep_dnt, posts=data, avg_rate=data1)
+	else:
+		return render_template('s_viewRate_sf.html', al_name=al_name, flt_num=flt_num, dep_dnt=dep_dnt, error="No Ratings Yet")
+			
+@app.route('/s_searchFlight')
+def s_searchFlight():
+	us_name = session['us_name']
+	al_name = session['al_name']
+	return render_template('s_searchFlight.html', us_name=us_name, al_name=al_name)
+
+@app.route('/s_flightSearch', methods=['GET', 'POST'])
+def s_flightSearch():
+#grabs information from the forms
+	us_name=session['us_name']
+	al_name=session['al_name']
+	s_airport = request.form['s_airport']
+	d_airport = request.form['d_airport']
+	s_date = request.form['s_date']
+	e_date = request.form['e_date']
+
+	#find if it is an airport search or a location search
+	if request.form.get("is_airport"):
+		is_airport = request.form['is_airport']
+	else:
+		is_airport = 'off'
+
+
+	if(is_airport=='on'):
+		#cursor used to send queries
+		cursor = conn.cursor()
+		#executes query
+		query = 'SELECT ap_id, flt_num, dep_dnt, dep_apt, arr_dnt, arr_apt, base_price, stts FROM flight JOIN airport S JOIN airport D WHERE S.apt_name = flight.dep_apt and D.apt_name = flight.arr_apt AND al_name = %s AND S.apt_name = %s AND D.apt_name = %s'
+		cursor.execute(query, (al_name, s_airport, d_airport))
+		data = cursor.fetchall()
+	elif(is_airport=='off' and s_airport!=''):
+		cursor = conn.cursor()
+		# executes query
+		query = 'SELECT ap_id, flt_num, dep_dnt, dep_apt, arr_dnt, arr_apt, base_price, stts FROM flight JOIN airport S JOIN airport D WHERE S.apt_name = flight.dep_apt and D.apt_name = flight.arr_apt AND al_name = %s AND S.city = %s AND D.city = %s'
+		cursor.execute(query, (al_name, s_airport, d_airport))
+		data = cursor.fetchall()
+	else:
+		cursor = conn.cursor()
+		# executes query
+		query = 'SELECT ap_id, flt_num, dep_dnt, dep_apt, arr_dnt, arr_apt, base_price, stts FROM flight WHERE al_name = %s AND dep_dnt > %s AND dep_dnt < %s'
+		cursor.execute(query, (al_name, s_date, e_date))
+		data = cursor.fetchall()
+
+	cursor.close()
+
+	if(data):
+		return render_template('s_searchFlight.html', posts=data)
+	else:
+		return render_template('s_searchFlight.html', error='Sorry, no such flight exist.')
+
+@app.route('/s_viewCustomer', methods=['GET', 'POST'])
+def s_viewCustomer():
+	flt_num = request.form['flt_num']
+	dep_dnt = request.form['dep_dnt']
+	cursor = conn.cursor()
+	query = 'SELECT email, tkt_id, purch_dnt FROM purchase NATURAL JOIN ticket NATURAL JOIN flight WHERE flt_num= %s AND dep_dnt= %s'
+	cursor.execute(query, (flt_num, dep_dnt))
+	data = cursor.fetchall()
+	cursor.close()
+	if(data):
+		return render_template('s_viewCustomer.html', posts=data, flt_num=flt_num, dep_dnt=dep_dnt)
+	else:
+		return render_template('s_viewCustomer.html', posts=data, flt_num=flt_num, error='No customers yet!')
+
+
 app.secret_key = 'some key that you will never guess'
 #Run the app on localhost port 5000
 #debug = True -> you don't have to restart flask
