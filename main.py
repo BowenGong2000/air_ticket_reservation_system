@@ -815,7 +815,7 @@ def s_viewRevenue():
 def s_modiApAp():
 	al_name = session['al_name']
 	cursor = conn.cursor()
-	query = 'SELECT ap_id, seat_num FROM airplane WHERE al_name = %s ORDER BY ap_id DESC'
+	query = 'SELECT ap_id, seat_num, company, age FROM airplane WHERE al_name = %s ORDER BY ap_id DESC'
 	cursor.execute(query, (al_name))
 	data = cursor.fetchall()
 
