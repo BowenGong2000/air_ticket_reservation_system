@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>View Statistics</title>
+</head>
+
+<body>
+
+    <h1>{{al_name}} Statistics</h1>
+
+    <b>Most Frequent Customer: {{top_c}}</b>
+
+    <table border="2" cellspacing="2">
+
+        <th>Flight Number</th>
+        <th>Departure Date and Time</th>
+        <th>Departure Airport</th>
+        <th>Arrival Date and Time</th>
+        <th>Arrival Airport</th>
+        <th>Ticket ID</th>
+
+        {% for line in posts %}
+        <tr>
+            <td>{{line['flt_num']}}</td>
+            <td>{{line['dep_dnt']}}</td>
+            <td>{{line['dep_apt']}}</td>
+            <td>{{line['arr_dnt']}}</td>
+            <td>{{line['arr_apt']}}</td>
+            <td>{{line['tkt_id']}}</td>
+        </tr>
+        {% endfor %}
+
+    </table>
+
+    <h1>Ticket Sold</h1>
+
+    <form action="/s_ticketSold" method="POST">
+		<b>Search for a Time Range</b></br>
+		<label for="s_date"> Start from </label>
+		<input type="date" name = "s_date"/> </br>
+		<label for="e_date"> To </label>
+		<input type="date" name = "e_date"/> </br>
+        <b>Or</b></br>
+        <label for="year"> Last Year </label>
+        <input type="checkbox" name="is_year" value="on"></br>
+        <label for="month"> Last Month </label>
+        <input type="checkbox" name="is_month" value="on"></br>
+		<input type="submit" value = Search />
+	</form>
+
+    <a href="/s_homepage">Go back</a>
+</body>
+</html>

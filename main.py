@@ -794,6 +794,154 @@ def s_viewCustomer():
 	else:
 		return render_template('s_viewCustomer.html', posts=data, flt_num=flt_num, error='No customers yet!')
 
+@app.route('/s_viewRevenue')
+def s_viewRevenue():
+	al_name = session['al_name']
+	cursor = conn.cursor()
+	query = 'SELECT SUM(sold_price) AS month_total, MONTH(purch_dnt) month FROM purchase NATURAL JOIN ticket NATURAL JOIN flight WHERE MONTH(purch_dnt) = MONTH(CURRENT_DATE) AND YEAR(purch_dnt) = YEAR(CURRENT_DATE) AND al_name = %s GROUP BY MONTH(purch_dnt)'
+	cursor.execute(query, (al_name))
+	data = cursor.fetchone()
+	month_total=data['month_total']
+	month=data['month']
+	query2 = 'SELECT SUM(sold_price) AS year_total, YEAR(purch_dnt) year FROM purchase NATURAL JOIN ticket NATURAL JOIN flight WHERE YEAR(purch_dnt) = YEAR(CURRENT_DATE) AND al_name = %s GROUP BY YEAR(purch_dnt)'
+	cursor.execute(query2, (al_name))
+	data1 = cursor.fetchone()
+	year_total = data1['year_total']
+	year = data1['year']
+	cursor.close()
+	return render_template('s_viewRevenue.html', month=month, month_total=month_total, year=year, year_total=year_total)
+
+@app.route('/s_modiApAp')
+def s_modiApAp():
+	al_name = session['al_name']
+	cursor = conn.cursor()
+	query = 'SELECT ap_id, seat_num FROM airplane WHERE al_name = %s ORDER BY ap_id DESC'
+	cursor.execute(query, (al_name))
+	data = cursor.fetchall()
+
+	if (data):
+		return render_template('s_modiApAp.html', al_name=al_name, posts=data)
+	else:
+		return render_template('s_modiApAp.html', al_name=al_name)
+
+@app.route('/s_addAirplane', methods=['GET', 'POST'])
+def s_addAirplane():
+	# grabs information from the forms
+	ap_id = request.form['ap_id']
+	al_name = session['al_name']
+	seat_num = request.form['seat_num']
+	company = request.form['company']
+	age = request.form['age']
+
+	# cursor used to send queries
+	cursor = conn.cursor()
+	# executes query
+	query = 'SELECT * FROM airplane WHERE al_name = %s and ap_id = %s'
+	cursor.execute(query, (al_name, ap_id))
+	# stores the results in a variable
+	data = cursor.fetchone()
+	# use fetchall() if you are expecting more than 1 data row
+	error = None
+	if (data):
+		# If the previous query returns data, then user exists
+		cursor = conn.cursor()
+		query = 'SELECT ap_id, seat_num FROM airplane WHERE al_name = %s ORDER BY ap_id DESC'
+		cursor.execute(query, (al_name))
+		data1 = cursor.fetchall()
+		error = "This plane already exists"
+		return render_template('/s_modiApAp.html', al_name=al_name, posts=data1, error=error)
+	else:
+		ins = 'INSERT INTO airplane VALUES(%s, %s, %s, %s, %s)'
+		cursor.execute(ins, (ap_id, al_name, seat_num, company, age))
+		conn.commit()
+		cursor.close()
+		return redirect("/s_modiApAp")
+
+@app.route('/s_addAirport', methods=['GET', 'POST'])
+def s_addAirport():
+	# grabs information from the forms
+	al_name=session['al_name']
+	apt_name = request.form['apt_name']
+	city = request.form['city']
+	country = request.form['country']
+	apt_type = request.form['apt_type']
+
+	# cursor used to send queries
+	cursor = conn.cursor()
+	# executes query
+	query = 'SELECT * FROM airport WHERE apt_name = %s'
+	cursor.execute(query, (apt_name))
+	# stores the results in a variable
+	data = cursor.fetchone()
+	print(data)
+	# use fetchall() if you are expecting more than 1 data row
+	error = None
+	if (data):
+		# If the previous query returns data, then user exists
+		query = 'SELECT ap_id, seat_num FROM airplane WHERE al_name = %s ORDER BY ap_id DESC'
+		cursor.execute(query, (al_name))
+		data1 = cursor.fetchall()
+		cursor.close()
+		error1 = "This airport already exists"
+		return render_template('as_modiApAp.html', al_name=al_name, posts=data1, error1=error1)
+	else:
+		ins = 'INSERT INTO airport VALUES(%s, %s, %s, %s)'
+		cursor.execute(ins, (apt_name, city, country, apt_type))
+		conn.commit()
+		cursor.close()
+		return redirect("/s_modiApAp")
+
+@app.route('/s_viewStat')
+def s_viewStat():
+	al_name = session['al_name']
+	cursor = conn.cursor()
+	query = 'SELECT email, COUNT(tkt_id) FROM purchase NATURAL JOIN ticket NATURAL JOIN flight WHERE al_name = %s GROUP BY email ORDER BY email DESC'
+	cursor.execute(query, (al_name))
+	data = cursor.fetchone()
+	email = data['email']
+	query1 = 'SELECT flt_num, dep_dnt, dep_apt, arr_dnt, arr_apt, tkt_id FROM purchase NATURAL JOIN ticket NATURAL JOIN flight WHERE email = %s AND al_name= %s'
+	cursor.execute(query1, (email, al_name))
+	data1 = cursor.fetchall()
+
+	cursor.close()
+
+	return render_template('s_viewStat.html', al_name=al_name, top_c=email, posts=data1)
+
+@app.route('/s_ticketSold', methods=['GET', 'POST'])
+def s_ticketSold():
+	al_name = session['al_name']
+	if request.form.get("s_date"):
+		s_date = request.form['s_date']
+		e_date = request.form['e_date']
+	else:
+		s_date = 'off'
+	if request.form.get("is_year"):
+		is_year = request.form['is_year']
+	else:
+		is_year = 'off'
+	if request.form.get("is_month"):
+		is_month = request.form['is_month']
+	else:
+		is_month = 'off'
+
+	if (s_date != 'off' ):
+		cursor = conn.cursor()
+		query = 'SELECT COUNT(tkt_id) AS tkt_total, MONTH(purch_dnt) month FROM purchase NATURAL JOIN ticket NATURAL JOIN flight WHERE purch_dnt > %s AND purch_dnt < %s AND al_name = %s GROUP BY MONTH(purch_dnt) ORDER BY month DESC'
+		cursor.execute(query, (s_date, e_date, al_name))
+		data = cursor.fetchall()
+		return render_template('s_ticketSold.html', posts=data, s_date=s_date, e_date=e_date)
+	elif (is_month == 'on'):
+		cursor = conn.cursor()
+		query = 'SELECT COUNT(tkt_id) AS tkt_total, MONTH(purch_dnt) month FROM purchase NATURAL JOIN ticket NATURAL JOIN flight WHERE purch_dnt > CURRENT_DATE - INTERVAL 1 MONTH AND purch_dnt < CURRENT_DATE AND al_name = %s GROUP BY MONTH(purch_dnt) ORDER BY month DESC'
+		cursor.execute(query, (al_name))
+		data = cursor.fetchall()
+		return render_template('s_ticketSold.html', posts=data, is_month=is_month)
+	else:
+		cursor = conn.cursor()
+		query = 'SELECT COUNT(tkt_id) AS tkt_total, MONTH(purch_dnt) month FROM purchase NATURAL JOIN ticket NATURAL JOIN flight WHERE purch_dnt > CURRENT_DATE - INTERVAL 12 MONTH AND purch_dnt < CURRENT_DATE AND al_name = %s GROUP BY MONTH(purch_dnt) ORDER BY month DESC'
+		cursor.execute(query, (al_name))
+		data = cursor.fetchall()
+		return render_template('s_ticketSold.html', posts=data, is_year=is_year)
 
 app.secret_key = 'some key that you will never guess'
 #Run the app on localhost port 5000

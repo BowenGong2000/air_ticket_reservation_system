@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>Airplane and Airport Modification</title>
+</head>
+
+<body>
+    <h1> {{al_name}}'s Airplane</br></h1>
+
+    <table border="2" cellspacing="2">
+        <th>Airplane ID</th>
+        <th>Seat Number</th>
+        <th>Company</th>
+        <th>Serve Age</th>
+
+        {% for line in posts %}
+        <tr>
+            <td>{{line['ap_id']}}</td>
+            <td>{{line['seat_num']}}</td>
+            <td>{{line['company']}}</td>
+            <td>{{line['age']}}</td>
+        </tr>
+        {% endfor %}
+    </table></br>
+
+    <h1>
+        Add New Airplanes
+    </h1>
+
+    <form action="/s_addAirplane" method="POST">
+        <label for="airplane"> Airplane ID </label>
+        <input type="number" name="ap_id" placeholder="Airplane ID" required /> </br>
+
+        <label for="seatnumber"> Seat Number </label>
+        <input type="number" name="seat_num" placeholder="Seat Number" required /> </br>
+
+        <label for="company"> Company </label>
+        <input type="company" name="company" placeholder="Company" required /> </br>
+
+        <label for="age"> Serve Age </label>
+        <input type="age" name="age" placeholder="Serve Age" required /> </br>
+
+        <input type="submit" value="Add New Airplane"/> </br>
+
+        {% if error %}
+        <p class="error"><strong>Error:</strong> {{error}}</p>
+        {% endif %}
+    </form>
+
+    <h1>
+        Add New Airports
+    </h1>
+
+    <form action="/s_addAirport" method="POST">
+        <label for="airport name"> Airport Name </label>
+        <input type="text" name="apt_name" placeholder="Airport Name" required /> </br>
+
+        <label for="city"> City </label>
+        <input type="text" name="city" placeholder="City" required /> </br>
+
+        <label for="country"> Country </label>
+        <input type="text" name="country" placeholder="Country" required /> </br>
+
+        <label for="type"> Type </label>
+        <input type="text" name="apt_type" placeholder="Type" required /> </br>
+
+        <input type="submit" value="Add New Airport"/> </br>
+        {% if error1 %}
+        <p class="error"><strong>Error:</strong> {{error1}}</p>
+        {% endif %}
+    </form>
+
+    <a href="/s_homepage">Go back</a>
+
+</body>
