@@ -440,11 +440,11 @@ def g_searchFlightAuth():
 
 	if (d_date == ""):
 		error = "Please enter departure date"
-		return render_template('/c_searchFlight.html', error = error)
+		return render_template('/g_search.html', error = error)
 
 	if (y != None and  r_date == ""):
 		error = "Please enter return date"
-		return render_template('/c_searchFlight.html', error = error)
+		return render_template('/g_search.html', error = error)
 
 	if (x == None):   #city
 		cursor = conn.cursor()
@@ -505,7 +505,7 @@ def check_status_auth():
 		return render_template('g_status.html', posts = data, error = error)
 	else:
 		print(666666)
-		error = "No such flight" 
+		error = "Sorry, no such flight exist" 
 		return render_template('g_status.html', posts = data, error = error)
 
 
